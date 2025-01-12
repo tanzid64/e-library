@@ -15,5 +15,6 @@ const imagekit = new ImageKit({
 });
 
 export async function GET() {
+  console.log(publicKey, privateKey, urlEndpoint);
   return NextResponse.json(imagekit.getAuthenticationParameters());
 }
