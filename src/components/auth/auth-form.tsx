@@ -1,6 +1,7 @@
 "use client";
 
 import { FIELD_NAMES, FIELD_TYPES } from "@/constants/dummy-data";
+import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import {
@@ -12,6 +13,7 @@ import {
   UseFormReturn,
 } from "react-hook-form";
 import { ZodType } from "zod";
+import FileUpload from "../global/file-upload";
 import { Button } from "../ui/button";
 import {
   Form,
@@ -22,7 +24,7 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import FileUpload from "../global/file-upload";
+import { useRouter } from "next/navigation";
 
 interface AuthFormProps<T extends FieldValues> {
   type: "SIGN_IN" | "SIGN_UP";
@@ -38,23 +40,30 @@ export const AuthForm = <T extends FieldValues>({
   onSubmit,
 }: AuthFormProps<T>) => {
   const isSignIn = type === "SIGN_IN";
+  const router = useRouter();
   const form: UseFormReturn<T> = useForm<T>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues as DefaultValues<T>,
   });
 
   const handleSubmit: SubmitHandler<T> = async (data) => {
-    try {
-      const result = await onSubmit(data);
-      if (!result.success) {
-        // Handle error (e.g., display error message)
-        console.error(result.error || "Unknown error occurred");
-      } else {
-        // Handle success (e.g., redirect or show success message)
-        console.log("Form submitted successfully!");
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
+    const result = await onSubmit(data);
+
+    if (result.success) {
+      toast({
+        title: "Success",
+        description: isSignIn
+          ? "You have successfully signed in."
+          : "You have successfully signed up.",
+      });
+
+      router.push("/");
+    } else {
+      toast({
+        title: `Error ${isSignIn ? "signing in" : "signing up"}`,
+        description: result.error?? "An error occurred.",
+        variant: "destructive",
+      })
     }
   };
 

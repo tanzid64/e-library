@@ -13,3 +13,11 @@ export interface Book {
   summary: string;
   isLoanedBook?: boolean;
 }
+
+export interface AuthCredentials {
+  email: string;
+  password: string;
+  fullName: string;
+  universityId: number;
+  universityCard: string;
+}
